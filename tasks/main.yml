@@ -1,0 +1,29 @@
+---
+
+########################################################################## Create the certificate(s) #################################################################################
+- name: Cleanning Certs folder. Removing keystore from folder.
+  file: path="{{ keystore }}" state=absent
+  become_user: "{{ user }}"
+
+- name: Cleanning Certs folder. Removing truststore from folder.
+  file: path="{{ truststore }}" state=absent
+  become_user: "{{ user }}"
+
+- name: Generating keystore and  SSL key. Adding SSL key to the keystore.
+  shell: {{ java_home }}/bin/keytool -genkey -noprompt -trustcacerts -alias {{ alias }} -keyalg RSA -keypass {{ KEY_PASS | mandatory }} -storepass {{ KEY_PASS | mandatory }} -keystore {{ keystore }} -keysize {{ keysize }} -validity {{ expires }} -dname "CN={{ item.cname }}, OU={{ item.organization_unit }}, O={{ item.organization }}, L={{ item.locality }}  S={{ item.state }} C={{ item.country }}"
+  with_items: "{{ selfsignedcertificate }}"
+  become_user: "{{ user }}"
+
+- name: Exporting Self-Signed Certificate.
+  shell: {{ java_home }}/bin/keytool -export -alias {{ alias }} -storepass {{ KEY_PASS | mandatory }} -file {{ selfsigned_cert }}  -keystore {{ keystore }}
+  become_user: "{{ user }}"
+
+- name: Creating truststore and adding Self-Signed Certificate to it.
+  shell: yes | {{ java_home }}/bin/keytool -import -v -trustcacerts -alias {{ alias }} -file {{ selfsigned_cert }} -keystore {{ truststore }} -keypass {{ KEY_PASS | mandatory }} -storepass {{ KEY_PASS | mandatory }}
+  become_user: "{{ user }}"
+
+- name: Cleanning Certs folder. Removing Self-signed certificate from folder.
+  file: path="{{ selfsigned_cert }}" state=absent
+  become_user: "{{ user }}"
+
+#######################################################################################################################################################################################

@@ -1,0 +1,36 @@
+---
+- hosts: "{{ TARGET_HOSTS | default('local') }}"
+  vars:
+##########################################################################
+#    Pass the key pass using ansible vault or through extra vars         #
+#    KEY_PASS:                                                           #
+#    Other variables on this playbook could be set on hosts inventory.   #
+##########################################################################
+
+    user: "{{ USER | default('appusr') }}"
+    product_name: "{{ PRODUCT_NAME }}"
+
+    # On this example, the certs_path variable was set to a wso2 api-manager instance. It was considered that the install path is /wso2/{{ PRODUCT_NAME }} and that the proper
+    # permissions were set.
+    certs_path: "/wso2/{{ product_name }}/repository/resources/security"
+    alias: wso2carbon
+    keystore_filename: wso2carbon.jks
+    truststore_filename: client-truststore.jks
+    keystore: "{{ certs_path }}/{{ keystore_filename }}"
+    truststore: "{{ certs_path }}/{{ truststore_filename }}"
+
+    keysize: 2048
+    expires: 3650
+    selfsigned_cert: "{{ certs_path }}/wso2carbon.cer"
+
+    selfsignedcertificate:
+        - { country: "{{ country }}",
+            state: "{{ state }}",
+            locality: "{{ city }}",
+            organization_unit: "{{ organization_ unit}}",
+            organization: "{{ organization}}",
+            cname: "{{ ansible_hostname }}"
+           }
+
+  roles:
+    - { role: certificate-n-keystores_create }
