@@ -8,6 +8,7 @@
 ##########################################################################
 
     user: "{{ USER | default('user') }}"
+    # product_name should be api-mgr, esb, dss or msg-broker
     product_name: "{{ PRODUCT_NAME }}"
 
     # On this example, the certs_path variable was set to a wso2 api-manager instance. It was considered that the install path is /wso2/{{ PRODUCT_NAME }} and that the proper
