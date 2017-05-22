@@ -29,5 +29,6 @@ galaxy_info:
   galaxy_tags:
     - keystore
     - certificate
+    - selfsigned
     - keytool
     - wso2
